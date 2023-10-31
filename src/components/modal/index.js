@@ -1,14 +1,22 @@
-import { StyleSheet, Text, View, TouchableOpacity, Pressable } from "react-native";
+import { StyleSheet, Text, View, TouchableOpacity, Pressable, TextInput } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import useStorage from "../../hooks/useStorage";
+import { useState } from "react";
 
 export default function ModalPassword({ password, handleClose }) {
   const { setItem } = useStorage();
+  const [name, setName] = useState("");
 
   const handleCopyPassword = async () => {
     await Clipboard.setStringAsync(password);
-    await setItem("@pass", password);
+
+    if (!name) {
+      alert("Nome da senha é obrigatório!");
+      return;
+    }
+
+    await setItem("@pass", password, name);
 
     alert("Senha salva!");
 
@@ -19,6 +27,12 @@ export default function ModalPassword({ password, handleClose }) {
     <View style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.title}>Senha gerada</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={(text) => setName(text)}
+          value={name}
+          placeholder="Nome da senha"
+        />
         <Pressable
           style={styles.innerPassword}
           onLongPress={handleCopyPassword}
@@ -103,4 +117,12 @@ const styles = StyleSheet.create({
     color: "#FFF",
     fontWeight: "bold",
   },
+  input: {
+    width: "90%",
+    borderWidth: 1,
+    borderColor: "#000",
+    borderRadius: 8,
+    padding: 8,
+    marginBottom: 14,
+  }
 });

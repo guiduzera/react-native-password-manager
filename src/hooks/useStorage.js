@@ -12,11 +12,11 @@ const useStorage = () => {
     }
   };
 
-  const setItem = async (key, value) => {
+  const setItem = async (key, value, identfy) => {
     try {
       let passwords = await getItem(key);
 
-      passwords.push(value);
+      passwords.push({ id: identfy, name: value });
 
       await AsyncStorage.setItem(key, JSON.stringify(passwords));
 
@@ -30,7 +30,7 @@ const useStorage = () => {
     try {
       let passwords = await getItem(key);
 
-      const restPasswords = passwords.filter((password) => password !== item);
+      const restPasswords = passwords.filter((password) => password.name !== item);
 
       await AsyncStorage.setItem(key, JSON.stringify(restPasswords));
 
@@ -40,10 +40,27 @@ const useStorage = () => {
     }
   };
 
+  const editItem = async (key, keyName, newKeyName) => {
+    let passwords = await getItem(key);
+
+    const editPasswords = passwords.map((item) => {
+      if (item.id === keyName) {
+        item.id = newKeyName;
+      }
+
+      return item;
+    });
+
+    await AsyncStorage.setItem(key, JSON.stringify(editPasswords));
+
+    return editPasswords;
+  };
+
   return {
     getItem,
     setItem,
     removeItem,
+    editItem,
   };
 };
 
